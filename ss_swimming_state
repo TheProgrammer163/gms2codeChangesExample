@@ -1,0 +1,62 @@
+
+//var swimmingDelay = 0;
+
+var swimUp = keyboard_check_pressed(ord("W")) || keyboard_check_pressed(ord("J"));
+var swimDownFaster = keyboard_check(ord("S"));
+var swimFaster = keyboard_check(ord("K"));
+var breastStrokeStrength = -8;
+var water_sinking_speed = 2; 
+var water_x_vel = 2;
+var water_faster_x_vel = 2*swimFaster;
+var getDirection = point_direction(xprevious, yprevious, x, y);
+
+var xPercentage = .12;
+
+// sinking and swimming mechanics
+
+
+// xmovement and sprite flipping
+	
+ss_update_facing(input.xinput);
+if(input.xinput != 0)
+{
+	var calulateMoveSpeed = lerp(xvel, input.xinput*(water_x_vel+water_faster_x_vel), xPercentage);
+	xvel = calulateMoveSpeed;
+}
+else
+{
+	xvel = lerp(xvel, 0, .08);
+}
+
+// vertical swimming movement
+if(swimUp) && yvel >= -2
+{
+	yvel = breastStrokeStrength;
+}
+
+// allow us to swim down faster or just simply fall if not touching the floor
+if(!ss_is_on_ground())
+{
+	
+	
+	var calculateYvel = lerp(yvel, water_sinking_speed+(swimDownFaster*2), .08);
+	if(yvel < calculateYvel)
+	{
+		yvel = calculateYvel;
+	}
+	else
+	{
+		yvel = water_sinking_speed;
+	}
+}
+
+//switching out of the water state and switching the water object transparency
+with(obj_water)
+{
+	image_alpha = lerp(image_alpha, .3, .18);
+	if(!other.is_on_water)
+	{
+		image_alpha = 1;
+		other.state = e_player_state.jumping;
+	}
+}
