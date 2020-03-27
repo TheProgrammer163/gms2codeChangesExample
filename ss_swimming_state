@@ -1,16 +1,15 @@
 
 //var swimmingDelay = 0;
 
-var swimUp = keyboard_check_pressed(ord("W")) || keyboard_check_pressed(ord("J"));
-var swimDownFaster = keyboard_check(ord("S"));
-var swimFaster = keyboard_check(ord("K"));
+var swimUp = (input.look_up_pressed || input.jump_pressed);
+var swimDownFaster = (input.crouch_held);
+var swimFaster = (input.secondary_action_held);
 var breastStrokeStrength = -8;
 var water_sinking_speed = 2; 
 var water_x_vel = 2;
 var water_faster_x_vel = 2*swimFaster;
 var getDirection = point_direction(xprevious, yprevious, x, y);
 
-var xPercentage = .12;
 
 // sinking and swimming mechanics
 
@@ -20,6 +19,7 @@ var xPercentage = .12;
 ss_update_facing(input.xinput);
 if(input.xinput != 0)
 {
+	var xPercentage = .12;
 	var calulateMoveSpeed = lerp(xvel, input.xinput*(water_x_vel+water_faster_x_vel), xPercentage);
 	xvel = calulateMoveSpeed;
 }
@@ -51,12 +51,13 @@ if(!ss_is_on_ground())
 }
 
 //switching out of the water state and switching the water object transparency
-with(obj_water)
-{
-	image_alpha = lerp(image_alpha, .3, .18);
-	if(!other.is_on_water)
-	{
-		image_alpha = 1;
-		other.state = e_player_state.jumping;
+if (ss_is_in_water()) {
+	with(obj_water) {
+		image_alpha = lerp(image_alpha, .3, .18);
 	}
+} else {
+	with(obj_water) {
+		image_alpha = lerp(image_alpha, .3, 1.1);
+	}
+	ss_change_state(e_player_state.jumping);
 }
